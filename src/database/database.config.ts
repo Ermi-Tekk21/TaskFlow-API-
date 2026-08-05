@@ -12,7 +12,8 @@ export const getDatabaseConfig = (
     password: configService.get<string>('DB_PASSWORD', 'postgres'),
     database: configService.get<string>('DB_DATABASE', 'taskflow_db'),
     autoLoadEntities: true,
-    synchronize: false, // Production best practice: use migrations instead of synchronize: true
+    synchronize: true,
     logging: process.env.NODE_ENV === 'development',
+    entities:[]
   };
 };
