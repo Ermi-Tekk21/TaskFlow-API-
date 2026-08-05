@@ -1,18 +1,39 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { HashService } from '../shared/services/hash.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly hashService: HashService,
+
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const existing = await this.userRepository.findByEmail(createUserDto.email);
     if (existing) {
       throw new ConflictException('User with this email already exists');
     }
-    return await this.userRepository.createUser(createUserDto);
+
+    const hashedPassword = await this.hashService.hashPassword(
+      createUserDto.password,
+    );
+
+    return await this.userRepository.createUser({
+      ...createUserDto,
+      password: hashedPassword,
+    });
   }
 
   async findAll(): Promise<User[]> {
@@ -28,6 +49,11 @@ export class UsersService {
   }
 
   async update(id: string, updateData: Partial<User>): Promise<User> {
+    if (updateData.password) {
+      updateData.password = await this.hashService.hashPassword(
+        updateData.password,
+      );
+    }
     return await this.userRepository.updateUser(id, updateData);
   }
 

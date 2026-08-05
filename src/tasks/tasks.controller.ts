@@ -16,6 +16,7 @@ import { UpdateStatusDto } from './dto/update-status.dto';
 import { TaskQueryDto } from './dto/task-query.dto';
 import { Task } from './entities/task.entity';
 import { TaskStatus } from './enums/task-status.enum';
+import { User } from '../users/entities/user.entity';
 
 @Controller('tasks')
 export class TasksController {
@@ -24,7 +25,7 @@ export class TasksController {
   @Post()
   async create(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
     // Dummy user until Auth Guard phase
-    const dummyUser = { id: '00000000-0000-0000-0000-000000000000' } as any;
+    const dummyUser = { id: '00000000-0000-0000-0000-000000000000' } as User;
     return await this.tasksService.create(createTaskDto, dummyUser);
   }
 

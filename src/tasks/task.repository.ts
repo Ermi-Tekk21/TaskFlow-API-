@@ -24,10 +24,6 @@ export class TaskRepository {
     return await this.repository.save(task);
   }
 
-  /**                                                                                  
-     * QueryBuilder implementation for Filtering, Sorting & Pagination (doc.pdf pages 6- 
- 7)                                                                                       
-    */
   async findAllWithFilters(
     queryDto: TaskQueryDto,
   ): Promise<{ data: Task[]; total: number; page: number; limit: number }> {
@@ -64,6 +60,7 @@ export class TaskRepository {
     const sortField = allowedSortFields.includes(sort)
       ? `task.${sort}`
       : 'task.createdAt';
+
     queryBuilder.orderBy(
       sortField,
       order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
