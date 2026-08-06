@@ -7,6 +7,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../../users/enums/role.enum';
+import { User } from '../../users/entities/user.entity';
+
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
@@ -21,7 +23,8 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{ user?: User }>();
+    const user = request.user;
     if (!user) {
       throw new ForbiddenException('User is not authenticated');
     }

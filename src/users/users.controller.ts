@@ -19,12 +19,12 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Role } from './enums/role.enum';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard) // Protect all user routes with JWT
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @Roles(Role.ADMIN) // Admin only can manually create users via /users
+  @Roles(Role.ADMIN)
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return await this.usersService.create(createUserDto);
   }
@@ -53,7 +53,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(Role.ADMIN) // Requirement from doc.pdf: Admin-only delete
+  @Roles(Role.ADMIN)
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return await this.usersService.remove(id);
   }

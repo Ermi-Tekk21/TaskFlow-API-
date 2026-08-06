@@ -10,6 +10,6 @@ import { AuthModule } from '../auth/auth.module';
   imports: [TypeOrmModule.forFeature([User]), forwardRef(() => AuthModule)],
   controllers: [UsersController],
   providers: [UsersService, UserRepository],
-  exports: [UsersService, UserRepository, TypeOrmModule],
+  exports: [UsersService, TypeOrmModule],
 })
 export class UsersModule {}
