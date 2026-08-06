@@ -14,6 +14,6 @@ export const getDatabaseConfig = (
     autoLoadEntities: true,
     synchronize: true,
     logging: process.env.NODE_ENV === 'development',
-    entities:[]
+    entities: [],
   };
 };
