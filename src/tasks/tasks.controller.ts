@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -16,22 +17,34 @@ import { UpdateStatusDto } from './dto/update-status.dto';
 import { TaskQueryDto } from './dto/task-query.dto';
 import { Task } from './entities/task.entity';
 import { TaskStatus } from './enums/task-status.enum';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
+import { Role } from '../users/enums/role.enum';
 
 @Controller('tasks')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  async create(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
-    // Dummy user until Auth Guard phase
-    const dummyUser = { id: '00000000-0000-0000-0000-000000000000' } as User;
-    return await this.tasksService.create(createTaskDto, dummyUser);
+  async create(
+    @Body() createTaskDto: CreateTaskDto,
+    @CurrentUser() user: User,
+  ): Promise<Task> {
+    return await this.tasksService.create(createTaskDto, user);
   }
 
   @Get()
   async findAll(@Query() queryDto: TaskQueryDto) {
     return await this.tasksService.findAll(queryDto);
+  }
+
+  @Get('me')
+  async findMyTasks(@CurrentUser() user: User): Promise<Task[]> {
+    return await this.tasksService.findMyTasks(user.id);
   }
 
   @Get(':id')
@@ -61,6 +74,7 @@ export class TasksController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN) // Requirement from doc.pdf: Admin-only delete
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return await this.tasksService.remove(id);
   }
