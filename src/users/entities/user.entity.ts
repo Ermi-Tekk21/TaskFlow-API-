@@ -30,6 +30,12 @@ export class User {
   })
   role: Role;
 
+  @Column({ default: 0 })
+  failedLoginAttempts: number;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  lockedUntil: Date | null;
+
   @OneToMany(() => Task, (task) => task.createdBy, { cascade: true })
   tasks: Task[];
 

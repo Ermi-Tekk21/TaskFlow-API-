@@ -1,29 +1,54 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { App } from 'supertest/types';
+import { ValidationPipe } from '@nestjs/common';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { AppModule } from './../src/app.module';
+import { HttpExceptionFilter } from './../src/common/filters/http-exception.filter';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+interface ErrorResponseBody {
+  success: boolean;
+  statusCode: number;
+  message: unknown;
+}
 
-  beforeEach(async () => {
+describe('AppModule (e2e)', () => {
+  let app: NestFastifyApplication;
+
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    );
+    app.useGlobalFilters(new HttpExceptionFilter());
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('/auth/register with empty body should return 400 Validation Error', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/auth/register',
+      payload: {},
+    });
+    expect(response.statusCode).toBe(400);
+    const body = JSON.parse(response.payload) as ErrorResponseBody;
+    expect(body.success).toBe(false);
+    expect(body.statusCode).toBe(400);
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await app.close();
   });
 });
