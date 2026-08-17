@@ -52,6 +52,12 @@ export class UsersController {
     return await this.usersService.update(id, updateData);
   }
 
+  @Patch(':id/unlock')
+  @Roles(Role.ADMIN)
+  async unlock(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
+    return await this.usersService.unlock(id);
+  }
+
   @Delete(':id')
   @Roles(Role.ADMIN)
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {

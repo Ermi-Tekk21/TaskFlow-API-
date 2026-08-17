@@ -42,6 +42,32 @@ export class UserRepository {
     return await this.findById(id);
   }
 
+  async resetFailedAttempts(id: string): Promise<void> {
+    await this.repository.update(id, {
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+    });
+  }
+
+  async incrementFailedAttempts(
+    id: string,
+    currentAttempts: number,
+    lockedUntil: Date | null = null,
+  ): Promise<void> {
+    await this.repository.update(id, {
+      failedLoginAttempts: currentAttempts + 1,
+      lockedUntil,
+    });
+  }
+
+  async unlockUser(id: string): Promise<User> {
+    await this.repository.update(id, {
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+    });
+    return await this.findById(id);
+  }
+
   async removeUser(id: string): Promise<void> {
     const result = await this.repository.delete(id);
     if (result.affected === 0) {

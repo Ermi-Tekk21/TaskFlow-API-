@@ -57,6 +57,26 @@ export class UsersService {
     return await this.userRepository.updateUser(id, updateData);
   }
 
+  async unlock(id: string): Promise<User> {
+    return await this.userRepository.unlockUser(id);
+  }
+
+  async resetFailedAttempts(id: string): Promise<void> {
+    await this.userRepository.resetFailedAttempts(id);
+  }
+
+  async incrementFailedAttempts(
+    id: string,
+    currentAttempts: number,
+    lockedUntil: Date | null = null,
+  ): Promise<void> {
+    await this.userRepository.incrementFailedAttempts(
+      id,
+      currentAttempts,
+      lockedUntil,
+    );
+  }
+
   async remove(id: string): Promise<void> {
     await this.userRepository.removeUser(id);
   }
