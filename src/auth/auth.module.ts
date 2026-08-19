@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
+import { BruteForceService } from './services/brute-force.service';
 import { UsersModule } from '../users/users.module';
 
 @Module({
@@ -16,7 +17,7 @@ import { UsersModule } from '../users/users.module';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET', 'super-secret-key'),
         signOptions: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           expiresIn: (configService.get<string>('JWT_EXPIRES_IN') ||
             '1d') as any,
         },
@@ -25,7 +26,7 @@ import { UsersModule } from '../users/users.module';
     forwardRef(() => UsersModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtModule, PassportModule],
+  providers: [AuthService, JwtStrategy, BruteForceService],
+  exports: [AuthService, JwtModule, PassportModule, BruteForceService],
 })
 export class AuthModule {}
