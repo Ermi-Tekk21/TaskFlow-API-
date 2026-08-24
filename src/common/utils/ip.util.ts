@@ -25,26 +25,35 @@ export function getClientIp(
   const forwarded = headers['x-forwarded-for'];
   if (typeof forwarded === 'string' && forwarded.length > 0) {
     const firstIp = forwarded.split(',')[0].trim();
-    if (firstIp) return firstIp;
+    if (firstIp) {
+      console.log(`Extracted client IP from X-Forwarded-For: ${firstIp}`);
+      return firstIp;
+    }
   } else if (Array.isArray(forwarded) && forwarded.length > 0) {
     const firstIp = forwarded[0]?.trim();
-    if (firstIp) return firstIp;
+    if (firstIp) {
+      console.log(`Extracted client IP from X-Forwarded-For: ${firstIp}`);
+      return firstIp;
+    }
   }
 
   // Cloudflare Connecting IP
   const cfIp = headers['cf-connecting-ip'];
   if (typeof cfIp === 'string' && cfIp.trim().length > 0) {
+    console.log(`Extracted client IP from Cloudflare: ${cfIp}`);
     return cfIp.trim();
   }
 
   // X-Real-IP (Nginx / Apache proxy)
   const realIp = headers['x-real-ip'];
   if (typeof realIp === 'string' && realIp.trim().length > 0) {
+    console.log(`Extracted client IP from X-Real-IP: ${realIp}`);
     return realIp.trim();
   }
 
   // Fastify/Express standard request.ip
   if (typeof reqObj.ip === 'string' && reqObj.ip.length > 0) {
+    console.log(`Extracted client IP from request.ip: ${reqObj.ip}`);
     return reqObj.ip;
   }
 
@@ -52,6 +61,7 @@ export function getClientIp(
   const socketAddress =
     reqObj.raw?.socket?.remoteAddress || reqObj.socket?.remoteAddress;
   if (socketAddress) {
+    console.log(`Extracted client IP from raw socket: ${socketAddress}`);
     return socketAddress;
   }
 
