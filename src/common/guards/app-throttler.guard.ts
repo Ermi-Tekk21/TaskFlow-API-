@@ -32,20 +32,20 @@ export class AppThrottlerGuard extends ThrottlerGuard {
   /**
    * Resolve tracker: Use authenticated user ID if available, otherwise client IP.
    */
-  protected async getTracker(req: Record<string, any>): Promise<string> {
+  protected getTracker(req: Record<string, any>): Promise<string> {
     const authReq = req as AuthenticatedRequest;
     const ip = getClientIp(req);
     const userId = authReq.user?.id || authReq.raw?.user?.id;
     if (userId) {
-      return `user:${userId}:${ip}`;
+      return Promise.resolve(`user:${userId}:${ip}`);
     }
-    return `ip:${ip}`;
+    return Promise.resolve(`ip:${ip}`);
   }
 
   /**
    * Custom user-friendly throttling exception with details about limits and retry-after.
    */
-  protected async throwThrottlingException(
+  protected throwThrottlingException(
     context: ExecutionContext,
     throttlerLimitDetail: ThrottlerLimitDetail,
   ): Promise<void> {
