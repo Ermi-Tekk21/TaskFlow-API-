@@ -1,11 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  Controller,
-  Get,
-  Post,
-  Req,
-  ExecutionContext,
-} from '@nestjs/common';
+import { Controller, Get, Post, Req, ExecutionContext } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import {
   FastifyAdapter,

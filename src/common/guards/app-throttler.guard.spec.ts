@@ -102,7 +102,9 @@ describe('AppThrottlerGuard', () => {
       } catch (err: unknown) {
         const error = err as ThrottlerException;
         expect(error.message).toContain('Rate limit exceeded');
-        expect(error.message).toContain('Maximum 5 requests allowed per window');
+        expect(error.message).toContain(
+          'Maximum 5 requests allowed per window',
+        );
         expect(error.message).toContain('Please try again after 60 seconds');
         expect(error.getStatus()).toBe(429);
       }
